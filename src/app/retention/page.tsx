@@ -1,281 +1,112 @@
-"use client";
+import type { Metadata } from "next";
+import RetentionClient from "./RetentionClient";
+import {
+  buildPageMetadata,
+  buildBreadcrumbSchema,
+  buildWebApplicationSchema,
+  buildFaqSchema,
+} from "@/lib/seo";
 
-import { useState } from "react";
-import Link from "next/link";
-import { LineChart as LineChartIcon, ArrowRight, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
-import { parseRetentionCsv, computeRetention, RetentionResult } from "@/lib/tools/retention";
-import { parseTranscript } from "@/lib/tools/deadair";
-import { RetentionChart } from "@/components/modules/RetentionChart";
-import { CopyBlock } from "@/components/common/CopyBlock";
-import { Gate } from "@/components/common/Gate";
-import { VoiceBanner } from "@/components/shell/VoiceBanner";
-import { saveHistoryRun, getVoiceProfile } from "@/lib/storage";
-import { SAMPLES } from "@/data/samples";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Textarea } from "@/components/ui/Textarea";
-import { Sticker } from "@/components/ui/Sticker";
-import { EqualizerLoader } from "@/components/ui/EqualizerLoader";
+export const metadata: Metadata = buildPageMetadata({
+  title: "YouTube Retention Reader: Hook Leak & Cliffs | YT Agent Studio",
+  description: "Visualize YouTube retention curves, diagnose Hook Leak in the first 30 seconds, detect drop-off cliffs, and receive one actionable editorial fix.",
+  path: "/retention",
+});
+
+const FAQS = [
+  {
+    question: "What is Hook Leak on a YouTube retention graph?",
+    answer: "Hook Leak is the percentage of viewers who stop watching during the first 30 seconds. A drop greater than 25% indicates that the opening hook is failing to confirm the premise promised in the title and thumbnail.",
+  },
+  {
+    question: "How does the tool identify retention cliffs?",
+    answer: "The algorithm calculates moving negative slopes along the retention curve and flags the top 5 steepest percentage drops occurring in 5-second intervals.",
+  },
+  {
+    question: "What is the Middle Slide rate?",
+    answer: "Middle Slide measures the rate of gradual audience attrition between 0:30 and the final 30 seconds. High slide rates indicate conversational drag or lack of visual variety.",
+  },
+  {
+    question: "Why does the tool deliver only one primary fix?",
+    answer: "Overloading creators with a dozen minor edits creates analysis paralysis. Prioritizing the single largest point of viewer drop-off ensures immediate editorial impact on your next upload.",
+  },
+];
 
 export default function RetentionPage() {
-  const [csvText, setCsvText] = useState("");
-  const [durationSec, setDurationSec] = useState<number>(600);
-  const [transcript, setTranscript] = useState("");
-  const [result, setResult] = useState<RetentionResult | null>(null);
-  const [aiAdvice, setAiAdvice] = useState<any>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [showSecondary, setShowSecondary] = useState(false);
-  const [shipped, setShipped] = useState(false);
-
-  const handleCompute = async (
-    csvContent: string = csvText,
-    dur: number = durationSec,
-    trText: string = transcript,
-    feedback?: string
-  ) => {
-    if (!csvContent.trim()) return;
-    try {
-      const rows = parseRetentionCsv(csvContent);
-      const cues = trText.trim() ? parseTranscript(trText) : undefined;
-      const res = computeRetention(rows, dur || undefined, cues);
-      setResult(res);
-      setShipped(false);
-
-      setIsAnalyzing(true);
-      const voice = getVoiceProfile();
-      const resp = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          module: "retention",
-          step: "advice",
-          input: { metrics: res },
-          voice,
-          feedback,
-        }),
-      });
-
-      const json = await resp.json();
-      if (json.data) {
-        setAiAdvice(json.data);
-      }
-    } catch (err: any) {
-      alert(`Error processing retention data: ${err.message}`);
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
-  const handleLoadSample = () => {
-    setCsvText(SAMPLES.retention.csv);
-    setDurationSec(SAMPLES.retention.duration);
-    setTranscript(SAMPLES.edit.transcript);
-    handleCompute(SAMPLES.retention.csv, SAMPLES.retention.duration, SAMPLES.edit.transcript);
-  };
-
-  const handleShip = () => {
-    if (!result) return;
-    const summary = `Hook Leak: ${result.hook_leak}% [${result.verdict}], Slide: ${result.slide_per_unit}%/unit`;
-    saveHistoryRun({
-      id: "retention-" + Date.now(),
-      module: "retention",
-      timestamp: new Date().toISOString(),
-      inputSummary: summary,
-      inputData: { durationSec },
-      outputData: { result, aiAdvice },
-      status: "shipped",
-    });
-    setShipped(true);
-  };
+  const breadcrumbs = buildBreadcrumbSchema([{ name: "Retention Reader", path: "/retention" }]);
+  const webapp = buildWebApplicationSchema({
+    path: "/retention",
+    name: "YouTube Audience Retention Reader",
+    description: "Visualizes retention curves, diagnoses Hook Leak, cliff drops, and middle slide rates, delivering exactly one primary fix.",
+  });
+  const faqSchema = buildFaqSchema(FAQS);
 
   return (
-    <div className="space-y-8 pb-20">
-      <VoiceBanner />
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webapp) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      {/* Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-line pb-6">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="type-label bg-surface-2 border border-line text-txt-2 px-2.5 py-0.5 rounded-pill font-mono">
-              /yt-retention
-            </span>
-            <Sticker label="AUDIENCE LEAKS" variant="red" rotate={-1} />
+      <RetentionClient />
+
+      <article className="mt-20 border-t border-line/60 pt-12 space-y-12">
+        <header className="space-y-4">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-txt tracking-tight">
+            YouTube Audience Retention Graph Reader
+          </h2>
+          <div className="p-5 rounded-xl border border-line-focus bg-surface-1 text-sm text-txt leading-relaxed font-medium">
+            An audience retention reader interprets YouTube Studio percentage watch-time exports. This tool charts your retention curve with interactive tooltips, diagnoses Hook Leak in the first 30 seconds, isolates steep drop Cliffs, measures mid-video Slide rates, and prescribes exactly one primary fix.
           </div>
-          <h1 className="type-h1 font-black tracking-tight text-txt flex items-center gap-3">
-            <LineChartIcon className="h-8 w-8 text-yt-red" />
-            <span>Audience Retention Reader</span>
-          </h1>
-          <p className="type-body text-txt-2 mt-1 max-w-2xl">
-            Export path: YouTube Studio &rarr; Video &rarr; Analytics &rarr; Engagement &rarr; Retention Chart &rarr; Download &ldquo;Audience retention&rdquo;.
-          </p>
+        </header>
+
+        <section className="space-y-4">
+          <h3 className="text-xl font-bold text-txt">How It Works</h3>
+          <ol className="grid gap-4 sm:grid-cols-3 list-decimal list-inside text-xs text-txt-2">
+            <li className="p-4 rounded-xl border border-line bg-surface-1">
+              <strong className="text-txt">1. Paste Retention Array:</strong> Copy the percentage retention series from YouTube Studio analytics or load sample data.
+            </li>
+            <li className="p-4 rounded-xl border border-line bg-surface-1">
+              <strong className="text-txt">2. Curve Diagnosis:</strong> Deterministic algorithms measure 0–30s Hook Leak, find the 5 steepest drop-off cliffs, and calculate slide rate per unit.
+            </li>
+            <li className="p-4 rounded-xl border border-line bg-surface-1">
+              <strong className="text-txt">3. Single Primary Fix:</strong> Synthesizes whether your video suffered an editorial preamble issue or a title-packaging disconnect.
+            </li>
+          </ol>
+        </section>
+
+        <div className="grid gap-6 sm:grid-cols-2 text-xs text-txt-2">
+          <section className="p-5 rounded-xl border border-line bg-surface-1 space-y-2">
+            <h3 className="text-sm font-bold text-txt">What You Get</h3>
+            <ul className="list-disc pl-4 space-y-1">
+              <li>Interactive retention curve chart</li>
+              <li>Hook Leak percentage benchmark (&lt;25% target)</li>
+              <li>Top 5 steepest drop cliffs mapped to timestamps</li>
+              <li>Exactly one focused editorial change for your next video</li>
+            </ul>
+          </section>
+
+          <section className="p-5 rounded-xl border border-line bg-surface-1 space-y-2">
+            <h3 className="text-sm font-bold text-txt">Honest Limits</h3>
+            <ul className="list-disc pl-4 space-y-1">
+              <li>Diagnostics reflect relative viewer retention, not absolute impressions.</li>
+              <li>Requires exported numerical series from YouTube Studio.</li>
+              <li>Pacing fixes apply to future video recordings and edits.</li>
+            </ul>
+          </section>
         </div>
 
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={handleLoadSample}
-          size="sm"
-        >
-          Load Golden Sample
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Inputs Card */}
-        <div className="lg:col-span-5">
-          <Card className="p-6 space-y-4">
-            <div className="space-y-1">
-              <label className="type-label font-bold text-txt block">
-                RETENTION CSV DATA (POSITION, WATCH %)
-              </label>
-              <Textarea
-                value={csvText}
-                onChange={(e) => setCsvText(e.target.value)}
-                rows={8}
-                placeholder="Paste Studio retention CSV (e.g. 0,100 / 5,88 / 10,76...)"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="type-label font-bold text-txt block">
-                VIDEO DURATION (SECONDS)
-              </label>
-              <Input
-                type="number"
-                value={durationSec}
-                onChange={(e) => setDurationSec(parseFloat(e.target.value) || 0)}
-                placeholder="e.g. 600"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="type-label font-bold text-txt block">
-                OPTIONAL TRANSCRIPT (MAPPINGS AT CLIFFS)
-              </label>
-              <Textarea
-                value={transcript}
-                onChange={(e) => setTranscript(e.target.value)}
-                rows={4}
-                placeholder="Paste timestamped transcript to map spoken words directly onto dropoff cliffs..."
-              />
-            </div>
-
-            <Button
-              type="button"
-              onClick={() => handleCompute()}
-              disabled={!csvText.trim() || isAnalyzing}
-              className="w-full mt-2"
-              size="lg"
-            >
-              <Sparkles className="h-4 w-4" />
-              <span>{isAnalyzing ? "Analyzing Retention..." : "Read Retention & Find Leaks"}</span>
-            </Button>
-          </Card>
-        </div>
-
-        {/* Right Output Area */}
-        <div className="lg:col-span-7 space-y-6">
-          {isAnalyzing && (
-            <Card className="p-10 flex flex-col items-center justify-center">
-              <EqualizerLoader
-                statusTexts={[
-                  "Parsing Studio CSV data points...",
-                  "Calculating first-30s hook leak percentage...",
-                  "Detecting steep cliffs (>5% drops)...",
-                  "Synthesizing the single biggest fix...",
-                ]}
-              />
-            </Card>
-          )}
-
-          {!isAnalyzing && result ? (
-            <>
-              {/* Primary AI Recommendation (ONE fix, not twenty) */}
-              {aiAdvice && (
-                <Card className="p-6 border-line bg-surface-2 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="type-label text-yt-red font-bold">
-                      PRIMARY RECOMMENDATION (1 FIX)
-                    </span>
-                    {aiAdvice.is_packaging_problem && (
-                      <Link
-                        href="/package"
-                        className="flex items-center gap-1.5 rounded-pill bg-yt-red text-white px-3 py-1 text-xs font-bold shadow-glow hover:bg-yt-red-ink transition-colors"
-                      >
-                        <span>Send to /yt-package</span>
-                        <ArrowRight className="h-3 w-3" />
-                      </Link>
-                    )}
-                  </div>
-
-                  <div>
-                    <h3 className="type-h3 font-black text-txt">
-                      {aiAdvice.single_biggest_leak}
-                    </h3>
-                    <p className="type-body text-txt-2 mt-1">
-                      {aiAdvice.one_change}
-                    </p>
-                  </div>
-
-                  {aiAdvice.secondary_notes?.length > 0 && (
-                    <div className="border-t border-line pt-3">
-                      <button
-                        type="button"
-                        onClick={() => setShowSecondary(!showSecondary)}
-                        className="flex items-center gap-1.5 type-label text-[11px] text-txt-2 hover:text-txt"
-                      >
-                        <span>{showSecondary ? "HIDE SECONDARY OBSERVATIONS" : "SHOW EVERYTHING ELSE"}</span>
-                        {showSecondary ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-                      </button>
-
-                      {showSecondary && (
-                        <ul className="mt-3 space-y-1.5 text-xs text-txt-2 list-disc list-inside">
-                          {aiAdvice.secondary_notes.map((note: string, idx: number) => (
-                            <li key={idx} className="leading-relaxed">{note}</li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  )}
-                </Card>
-              )}
-
-              {/* Chart & Deterministic Metrics */}
-              <RetentionChart data={result} />
-
-              {/* Gate Bar */}
-              <Gate
-                onShip={handleShip}
-                onChange={(fb) => handleCompute(csvText, durationSec, transcript, fb)}
-                isIterating={isAnalyzing}
-                shipped={shipped}
-              />
-            </>
-          ) : (
-            !isAnalyzing && (
-              <Card className="flex flex-col items-center justify-center min-h-[340px] p-8 text-center border-dashed">
-                <div className="type-hero font-black text-line/40 select-none">
-                  /yt-retention
-                </div>
-                <h3 className="type-h3 font-black text-txt mt-2">No Retention CSV Loaded</h3>
-                <p className="type-small text-txt-2 max-w-sm mt-1">
-                  Paste your Studio audience retention export data to inspect hook leak, steep drop cliffs, and middle slide.
-                </p>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={handleLoadSample}
-                  className="mt-4"
-                  size="sm"
-                >
-                  Load Golden Retention Sample
-                </Button>
-              </Card>
-            )
-          )}
-        </div>
-      </div>
-    </div>
+        <section className="space-y-4">
+          <h3 className="text-xl font-bold text-txt">Frequently Asked Questions</h3>
+          <div className="space-y-3">
+            {FAQS.map((faq, idx) => (
+              <div key={idx} className="p-4 rounded-xl border border-line bg-surface-1">
+                <h4 className="font-bold text-sm text-txt">{faq.question}</h4>
+                <p className="text-xs text-txt-2 mt-2 leading-relaxed">{faq.answer}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </article>
+    </>
   );
 }

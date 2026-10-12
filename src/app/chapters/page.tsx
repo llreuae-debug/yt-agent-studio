@@ -1,316 +1,108 @@
-"use client";
+import type { Metadata } from "next";
+import ChaptersClient from "./ChaptersClient";
+import {
+  buildPageMetadata,
+  buildBreadcrumbSchema,
+  buildWebApplicationSchema,
+  buildFaqSchema,
+} from "@/lib/seo";
 
-import { useState } from "react";
-import { Bookmark, Sparkles, CheckCircle2, AlertCircle, Clock } from "lucide-react";
-import { parseTranscript } from "@/lib/tools/deadair";
-import { computeChapters, ChaptersResult } from "@/lib/tools/chapters";
-import { TranscriptInput } from "@/components/common/TranscriptInput";
-import { CopyBlock } from "@/components/common/CopyBlock";
-import { Gate } from "@/components/common/Gate";
-import { VoiceBanner } from "@/components/shell/VoiceBanner";
-import { saveHistoryRun, getVoiceProfile } from "@/lib/storage";
-import { SAMPLES } from "@/data/samples";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Sticker } from "@/components/ui/Sticker";
-import { EqualizerLoader } from "@/components/ui/EqualizerLoader";
+export const metadata: Metadata = buildPageMetadata({
+  title: "YouTube Compliant Chapters: Rules & Validation | YT Agent Studio",
+  description: "Generate valid YouTube chapters enforced against official platform rules: mandatory 0:00 start, at least 3 chapters, and minimum 10-second duration.",
+  path: "/chapters",
+});
+
+const FAQS = [
+  {
+    question: "What are YouTube's non-negotiable rules for chapters?",
+    answer: "YouTube enforces 3 rules: the first timestamp must start at 0:00, there must be at least 3 chapters in ascending chronological order, and each chapter must be at least 10 seconds long.",
+  },
+  {
+    question: "Why does the tool analyze pause gaps for chapter boundaries?",
+    answer: "Longer pause gaps (e.g. 2 to 4 seconds) in speech transcripts frequently correspond to topic transitions, slide changes, or visual chapter shifts.",
+  },
+  {
+    question: "How do chapters enable Google Search 'Key Moments'?",
+    answer: "Google indexes compliant YouTube chapters to create interactive Key Moments in search results, driving direct search traffic to exact solutions in your video.",
+  },
+];
 
 export default function ChaptersPage() {
-  const [transcript, setTranscript] = useState("");
-  const [targetCount, setTargetCount] = useState<number>(7);
-  const [chaptersResult, setChaptersResult] = useState<ChaptersResult | null>(null);
-  const [relabelledChapters, setRelabelledChapters] = useState<{ start: number; label: string; title: string; filler?: boolean }[]>([]);
-  const [isRetitling, setIsRetitling] = useState(false);
-  const [shipped, setShipped] = useState(false);
-
-  const handleCompute = async (trText: string = transcript, target: number = targetCount, feedback?: string) => {
-    if (!trText.trim()) return;
-    const cues = parseTranscript(trText);
-    if (cues.length < 6) {
-      alert("Too few cues to chapter (minimum 6 cues required).");
-      return;
-    }
-
-    const res = computeChapters(cues, target);
-    setChaptersResult(res);
-    setShipped(false);
-
-    if (res.valid) {
-      setIsRetitling(true);
-      try {
-        const voice = getVoiceProfile();
-        const resp = await fetch("/api/generate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            module: "chapters",
-            step: "retitle",
-            input: { chapters: res.chapters },
-            voice,
-            feedback,
-          }),
-        });
-
-        const json = await resp.json();
-        if (json.data?.relabelled_chapters) {
-          setRelabelledChapters(
-            json.data.relabelled_chapters.map((rc: any) => ({
-              start: rc.start,
-              label: rc.label,
-              title: rc.relabelled_title,
-              filler: rc.flagged_filler,
-            }))
-          );
-        } else {
-          setRelabelledChapters(
-            res.chapters.map((c) => ({
-              start: c.start,
-              label: c.label,
-              title: c.draft_title,
-            }))
-          );
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsRetitling(false);
-      }
-    }
-  };
-
-  const handleLoadSample = () => {
-    setTranscript(SAMPLES.chapters.transcript);
-    setTargetCount(SAMPLES.chapters.target);
-    handleCompute(SAMPLES.chapters.transcript, SAMPLES.chapters.target);
-  };
-
-  const formattedChaptersBlock =
-    relabelledChapters.length > 0
-      ? relabelledChapters.map((c) => `${c.label} ${c.title}`).join("\n")
-      : chaptersResult?.chapters.map((c) => `${c.label} ${c.draft_title}`).join("\n") || "";
-
-  const isFinalValid =
-    chaptersResult?.valid && (relabelledChapters.length >= 3 || (chaptersResult?.chapters.length || 0) >= 3);
-
-  const activeChapters = relabelledChapters.length > 0 ? relabelledChapters : chaptersResult?.chapters.map(c => ({
-    start: c.start,
-    label: c.label,
-    title: c.draft_title,
-    filler: false,
-  })) || [];
-
-  const handleShip = () => {
-    if (!formattedChaptersBlock) return;
-    navigator.clipboard.writeText(formattedChaptersBlock);
-    saveHistoryRun({
-      id: "chapters-" + Date.now(),
-      module: "chapters",
-      timestamp: new Date().toISOString(),
-      inputSummary: `${activeChapters.length} Chapters (${isFinalValid ? "Valid" : "Invalid"})`,
-      inputData: { targetCount },
-      outputData: { formattedChaptersBlock, chaptersResult },
-      status: "shipped",
-    });
-    setShipped(true);
-  };
+  const breadcrumbs = buildBreadcrumbSchema([{ name: "Compliant Chapters", path: "/chapters" }]);
+  const webapp = buildWebApplicationSchema({
+    path: "/chapters",
+    name: "YouTube Compliant Chapters Generator",
+    description: "Enforces YouTube's non-negotiable rules (0:00 start, 3+ chapters, 10s minimum) with pause gap analysis and custom retitling.",
+  });
+  const faqSchema = buildFaqSchema(FAQS);
 
   return (
-    <div className="space-y-8 pb-20">
-      <VoiceBanner />
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webapp) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      {/* Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-line pb-6">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="type-label bg-surface-2 border border-line text-txt-2 px-2.5 py-0.5 rounded-pill font-mono">
-              /yt-chapters
-            </span>
-            <Sticker label="0:00 ENFORCED" variant="ok" rotate={-1} />
+      <ChaptersClient />
+
+      <article className="mt-20 border-t border-line/60 pt-12 space-y-12">
+        <header className="space-y-4">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-txt tracking-tight">
+            YouTube Compliant Chapters Generator
+          </h2>
+          <div className="p-5 rounded-xl border border-line-focus bg-surface-1 text-sm text-txt leading-relaxed font-medium">
+            A YouTube chapter generator converts transcripts into validated player segments. This tool enforces YouTube&apos;s non-negotiable rules (mandatory 0:00 start, at least 3 chapters, and 10s minimum each), analyzes pause gaps and vocabulary shifts, and retitles sections in your creator voice.
           </div>
-          <h1 className="type-h1 font-black tracking-tight text-txt flex items-center gap-3">
-            <Bookmark className="h-8 w-8 text-yt-red" />
-            <span>YouTube Chapters Generator</span>
-          </h1>
-          <p className="type-body text-txt-2 mt-1 max-w-2xl">
-            Strict algorithm compliance: first timestamp is always 0:00, at least 3 chapters, each section at least 10 seconds.
-          </p>
+        </header>
+
+        <section className="space-y-4">
+          <h3 className="text-xl font-bold text-txt">How It Works</h3>
+          <ol className="grid gap-4 sm:grid-cols-3 list-decimal list-inside text-xs text-txt-2">
+            <li className="p-4 rounded-xl border border-line bg-surface-1">
+              <strong className="text-txt">1. Paste Timestamped Transcript:</strong> Load an .srt or .vtt subtitle file.
+            </li>
+            <li className="p-4 rounded-xl border border-line bg-surface-1">
+              <strong className="text-txt">2. Boundary Detection:</strong> Clusters pause gaps and topic transitions into candidate timestamp markers while enforcing 0:00 and 10s rules.
+            </li>
+            <li className="p-4 rounded-xl border border-line bg-surface-1">
+              <strong className="text-txt">3. Retitle in Creator Voice:</strong> Generates punchy, search-friendly titles for each segment and outputs ready-to-paste timestamps.
+            </li>
+          </ol>
+        </section>
+
+        <div className="grid gap-6 sm:grid-cols-2 text-xs text-txt-2">
+          <section className="p-5 rounded-xl border border-line bg-surface-1 space-y-2">
+            <h3 className="text-sm font-bold text-txt">What You Get</h3>
+            <ul className="list-disc pl-4 space-y-1">
+              <li>100% YouTube compliant timestamps</li>
+              <li>Enforced 0:00 start and &gt;=10s duration verification</li>
+              <li>Retitled chapter names in your voice</li>
+              <li>One-click copyable description block</li>
+            </ul>
+          </section>
+
+          <section className="p-5 rounded-xl border border-line bg-surface-1 space-y-2">
+            <h3 className="text-sm font-bold text-txt">Honest Limits</h3>
+            <ul className="list-disc pl-4 space-y-1">
+              <li>Automatic boundary detection relies on subtitle timestamp accuracy.</li>
+              <li>Complex conceptual transitions should be manually double-checked.</li>
+              <li>Chapters must be pasted into the description, not comments, for player segments.</li>
+            </ul>
+          </section>
         </div>
 
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={handleLoadSample}
-          size="sm"
-        >
-          Load Golden Sample
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Inputs */}
-        <div className="lg:col-span-5">
-          <Card className="p-6 space-y-4">
-            <TranscriptInput
-              value={transcript}
-              onChange={(val) => {
-                setTranscript(val);
-                handleCompute(val, targetCount);
-              }}
-              placeholder="Paste transcript (.srt, .vtt, whisper .json)..."
-            />
-
-            <div className="space-y-1">
-              <label className="type-label font-bold text-txt block">
-                TARGET NUMBER OF CHAPTERS
-              </label>
-              <Input
-                type="number"
-                min={3}
-                max={25}
-                value={targetCount}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value, 10) || 7;
-                  setTargetCount(val);
-                  if (transcript) handleCompute(transcript, val);
-                }}
-              />
-            </div>
-
-            <Button
-              type="button"
-              onClick={() => handleCompute()}
-              disabled={!transcript.trim() || isRetitling}
-              className="w-full mt-2"
-              size="lg"
-            >
-              <Bookmark className="h-4 w-4" />
-              <span>{isRetitling ? "Retitling in Your Voice..." : "Extract & Retitle Chapters"}</span>
-            </Button>
-          </Card>
-        </div>
-
-        {/* Right Output */}
-        <div className="lg:col-span-7 space-y-6">
-          {isRetitling && (
-            <Card className="p-10 flex flex-col items-center justify-center">
-              <EqualizerLoader
-                statusTexts={[
-                  "Enforcing 0:00 YouTube requirement...",
-                  "Calculating topic boundary gaps...",
-                  "Retitling sections under 5 words in your voice...",
-                ]}
-              />
-            </Card>
-          )}
-
-          {!isRetitling && chaptersResult ? (
-            <div className="space-y-6">
-              {/* Live Validity Badge */}
-              <div
-                className={`flex items-center justify-between rounded-pill border px-5 py-3 text-xs font-bold ${
-                  isFinalValid
-                    ? "bg-ok/10 border-ok/30 text-ok"
-                    : "bg-bad/10 border-bad/30 text-bad"
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  {isFinalValid ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-                  <span>
-                    {isFinalValid
-                      ? "YouTube Validated: Meets 0:00 start, 3+ chapters, and 10s minimum requirements."
-                      : "INVALID CHAPTER LIST: YouTube will silently reject this block in the description."}
-                  </span>
-                </div>
-                <Sticker label={isFinalValid ? "VALIDATED" : "BLOCKED"} variant={isFinalValid ? "ok" : "bad"} rotate={1} />
+        <section className="space-y-4">
+          <h3 className="text-xl font-bold text-txt">Frequently Asked Questions</h3>
+          <div className="space-y-3">
+            {FAQS.map((faq, idx) => (
+              <div key={idx} className="p-4 rounded-xl border border-line bg-surface-1">
+                <h4 className="font-bold text-sm text-txt">{faq.question}</h4>
+                <p className="text-xs text-txt-2 mt-2 leading-relaxed">{faq.answer}</p>
               </div>
-
-              {/* Vertical Timeline with Timecode Pills */}
-              {isFinalValid && activeChapters.length > 0 && (
-                <Card className="p-6 border-line space-y-4">
-                  <h4 className="type-h3 font-black text-txt">Chapter Timeline</h4>
-                  <div className="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-line">
-                    {activeChapters.map((ch, idx) => (
-                      <div key={idx} className="relative flex items-start gap-4 group">
-                        {/* Timeline marker */}
-                        <div className="absolute -left-6 top-1.5 w-3.5 h-3.5 rounded-full border-2 border-yt-red bg-surface-1 group-hover:scale-125 transition-transform" />
-
-                        {/* Timecode pill */}
-                        <span className="type-tabular font-mono text-xs font-black px-3 py-1 rounded-pill bg-surface-2 border border-line text-txt group-hover:border-yt-red transition-colors shrink-0">
-                          {ch.label}
-                        </span>
-
-                        {/* Title & filler chip */}
-                        <div className="space-y-1">
-                          <p className="type-body font-bold text-txt leading-snug">
-                            {ch.title}
-                          </p>
-                          {ch.filler && (
-                            <span className="type-label text-[9px] text-warn bg-warn/10 border border-warn/30 px-2 py-0.5 rounded-pill inline-block">
-                              POSSIBLE FILLER TITLE
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-              )}
-
-              {/* Paste-Ready Block */}
-              {isFinalValid ? (
-                <>
-                  <CopyBlock
-                    content={formattedChaptersBlock}
-                    title="Paste-Ready Description Chapters"
-                    filename="youtube_chapters.txt"
-                  />
-
-                  <Gate
-                    onShip={handleShip}
-                    onChange={(fb) => handleCompute(transcript, targetCount, fb)}
-                    isIterating={isRetitling}
-                    shipped={shipped}
-                  />
-                </>
-              ) : (
-                <Card className="p-6 border-bad/30 bg-bad/10 text-xs space-y-3">
-                  <h4 className="type-label font-bold text-bad">VALIDATION ERRORS DETECTED:</h4>
-                  <ul className="list-disc list-inside space-y-1 text-txt">
-                    {chaptersResult.validationErrors?.map((err, i) => (
-                      <li key={i}>{err}</li>
-                    ))}
-                  </ul>
-                  <p className="type-small text-txt-2 pt-2">
-                    Never present invalid chapters as ready. Add more content or adjust chapter count.
-                  </p>
-                </Card>
-              )}
-            </div>
-          ) : (
-            !isRetitling && (
-              <Card className="flex flex-col items-center justify-center min-h-[340px] p-8 text-center border-dashed">
-                <div className="type-hero font-black text-line/40 select-none">
-                  /yt-chapters
-                </div>
-                <h3 className="type-h3 font-black text-txt mt-2">No Chapters Generated</h3>
-                <p className="type-small text-txt-2 max-w-sm mt-1">
-                  Upload or paste a timestamped transcript to extract natural topic pauses and generate verified YouTube chapters.
-                </p>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={handleLoadSample}
-                  className="mt-4"
-                  size="sm"
-                >
-                  Load Golden Sample (3 Chapters)
-                </Button>
-              </Card>
-            )
-          )}
-        </div>
-      </div>
-    </div>
+            ))}
+          </div>
+        </section>
+      </article>
+    </>
   );
 }

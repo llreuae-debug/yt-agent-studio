@@ -159,12 +159,52 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             })}
           </div>
 
+          {/* Resources & Guides */}
+          <div className="space-y-1 pt-2 border-t border-line/40">
+            <span className="type-label text-txt-2 px-3 block mb-1 font-bold">
+              Knowledge & Docs
+            </span>
+            <Link
+              href="/guides/audience-retention"
+              onClick={onClose}
+              className={`flex items-center gap-2.5 rounded-pill px-3.5 py-1.5 text-xs transition-all ${
+                pathname.startsWith("/guides")
+                  ? "bg-surface-3 text-yt-red font-bold"
+                  : "text-txt-2 hover:bg-surface-3 hover:text-txt"
+              }`}
+            >
+              <span>Creator Guides</span>
+            </Link>
+            <Link
+              href="/faq"
+              onClick={onClose}
+              className={`flex items-center gap-2.5 rounded-pill px-3.5 py-1.5 text-xs transition-all ${
+                pathname === "/faq"
+                  ? "bg-surface-3 text-yt-red font-bold"
+                  : "text-txt-2 hover:bg-surface-3 hover:text-txt"
+              }`}
+            >
+              <span>FAQ</span>
+            </Link>
+            <Link
+              href="/about"
+              onClick={onClose}
+              className={`flex items-center gap-2.5 rounded-pill px-3.5 py-1.5 text-xs transition-all ${
+                pathname === "/about"
+                  ? "bg-surface-3 text-yt-red font-bold"
+                  : "text-txt-2 hover:bg-surface-3 hover:text-txt"
+              }`}
+            >
+              <span>About & Fact Sheet</span>
+            </Link>
+          </div>
+
           {/* Styleguide link */}
-          <div className="border-t border-line/60 pt-3">
+          <div className="border-t border-line/60 pt-2">
             <Link
               href="/design-system"
               onClick={onClose}
-              className={`flex items-center gap-2.5 rounded-pill px-3.5 py-2 text-xs font-bold transition-all ${
+              className={`flex items-center gap-2.5 rounded-pill px-3.5 py-1.5 text-xs font-bold transition-all ${
                 pathname === "/design-system"
                   ? "bg-surface-3 text-yt-red"
                   : "text-txt-2 hover:bg-surface-3 hover:text-txt"

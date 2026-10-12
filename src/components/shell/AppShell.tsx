@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { MobileDock } from "./MobileDock";
+import { Footer } from "./Footer";
 import { CommandPalette } from "@/components/ui/CommandPalette";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -14,8 +15,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex flex-1 flex-col overflow-hidden min-w-0">
         <Topbar onOpenSidebar={() => setSidebarOpen(true)} />
-        <main className="flex-1 overflow-y-auto px-4 py-8 pb-28 sm:px-8 lg:pb-8 max-w-7xl w-full mx-auto">
-          {children}
+        <main className="flex-1 overflow-y-auto px-4 py-8 pb-28 sm:px-8 lg:pb-8 max-w-7xl w-full mx-auto flex flex-col justify-between">
+          <div>{children}</div>
+          <Footer />
         </main>
       </div>
 

@@ -1,0 +1,6 @@
+Contact: mailto:security@ytagentstudio.com
+Expires: 2027-10-13T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://yt-agent-studio.vercel.app/.well-known/security.txt
+Policy: https://yt-agent-studio.vercel.app/terms
+Acknowledgments: https://yt-agent-studio.vercel.app/about

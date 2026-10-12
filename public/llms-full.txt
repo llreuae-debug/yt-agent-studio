@@ -1,0 +1,69 @@
+# YT Agent Studio — Comprehensive Technical Specification & LLM Reference
+
+## Product Overview
+YT Agent Studio is an open-source, local-first web application designed for YouTube video creators, editors, and producers. It ports and expands the 11 Claude skills and 6 Python tools from the open-source repository `Jakeschincariol/youtube-agent-skill` into a TypeScript-based web studio with zero cloud storage dependencies.
+
+- Canonical URL: https://yt-agent-studio.vercel.app
+- Source Repository: https://github.com/llreuae-debug/yt-agent-studio
+- Upstream Base: https://github.com/Jakeschincariol/youtube-agent-skill
+- License: MIT License (https://opensource.org/licenses/MIT)
+- Non-Affiliation Notice: YT Agent Studio is an independent open-source tool and is not affiliated with, endorsed by, or sponsored by YouTube or Google.
+
+## Key Principles & Guardrails
+
+1. **Deterministic First, AI Second:**
+   All scoring, character counting, gap calculation, formula classification, and multiplier filtering are executed locally in TypeScript using deterministic rules. AI models are only used for text synthesis, script drafting, and structured commentary. AI never fabricates or eyeballs numeric scores.
+
+2. **The Digit Audit (Never Invent Figures):**
+   The client-side `numberCheck.ts` algorithm inspects all synthesized AI text. Any number or metric appearing in the AI output that was not explicitly present in the creator's input transcript, metadata, or deterministic tool calculations is flagged with a visual warning chip.
+
+3. **Local-First Privacy:**
+   No video transcripts, ideas, titles, comments, or analytics are stored on external servers or databases. All creator data is saved exclusively in the user's browser `localStorage`, with one-click JSON backup export and restore.
+
+4. **The Gate ("Ship it, or change it?"):**
+   Every module terminates in a consistent decision Gate. The creator must explicitly review the output and choose either "Ship it" (which copies formatted Markdown to the clipboard and records the run in local history) or "Change it" (which prompts for iterative feedback).
+
+5. **Honest Limits:**
+   Hook Score is an empirical diagnostic heuristic (scoring Specificity, Address, Stakes, Curiosity, and Brevity), not an algorithm predictor. No tool in YT Agent Studio claims to guarantee YouTube impressions, algorithm distribution, or views.
+
+## Deterministic Tools & Heuristics
+
+### 1. Hook Score (`src/lib/tools/hookscore.ts`)
+Evaluates opening statements (the first 15 seconds) against five weighted dimensions (0–10 each):
+- **Specificity (25%):** Penalizes vague abstractions; rewards concrete nouns, tools, and measurements.
+- **Address (25%):** Penalizes generic plural greetings ("Hey guys"); rewards direct second-person singular ("you", "your").
+- **Stakes (20%):** Measures clear downside or upside ("before you quit", "saves 40 hours").
+- **Curiosity (15%):** Evaluates open information loops without descending into empty clickbait.
+- **Brevity (15%):** Optimal range is 12–28 words. Heavy penalties below 8 words or above 36 words.
+Uses Banker's Rounding (round-half-to-even) to calculate a final score out of 10 and assigns one of four score bands: Elite (9.0–10.0), Strong (7.5–8.9), Needs Polish (5.0–7.4), or Rewrite (<5.0). Matches against 21 regular expression hook formulas.
+
+### 2. Title & Packaging Linter (`src/lib/tools/title.ts`)
+- **Desktop Cutoff:** 60 characters. Characters beyond 60 are truncated in YouTube desktop search results.
+- **Mobile Cutoff:** 40 characters. Characters beyond 40 are truncated in mobile feeds and push notifications.
+- **Linter Checks:** All-caps shouting detection, vague clickbait detection, concrete number validation, and thumbnail word duplication (flagging identical words across title and thumbnail to maximize packaging real estate).
+
+### 3. Edit Decision List Cutter (`src/lib/tools/deadair.ts`)
+- Parses timestamped subtitle transcripts (`.srt`, `.vtt`, or Whisper JSON).
+- Identifies speech pauses exceeding a configurable floor (default 1.2 seconds).
+- Flags conversational filler vocables ("um", "uh", "like", "you know").
+- Detects stutter restarts (repeated phrases across adjacent subtitles).
+- Exports cut decisions to DaVinci Resolve / Premiere compatible CSV and formatted EDL text.
+
+### 4. YouTube Compliant Chapters (`src/lib/tools/chapters.ts`)
+Strictly validates against official YouTube platform requirements:
+- Must begin at timestamp `0:00`.
+- Must contain at least 3 chapters.
+- Each chapter must have a minimum duration of 10 seconds.
+- Automatically clusters pauses and topic transitions to propose timestamp markers.
+
+### 5. Audience Retention Analyzer (`src/lib/tools/retention.ts`)
+- Ingests percentage watch-time arrays exported from YouTube Studio analytics.
+- **Hook Leak:** Measures the percentage drop occurring between 0:00 and 0:30 (values >25% indicate hook failure).
+- **Cliff Drops:** Identifies the top 5 steepest negative slopes in 5-second increments and maps them to spoken lines.
+- **Middle Slide:** Measures the rate of gradual viewer attrition across the video body (0:30 to end minus 30s).
+- Prescribes exactly one primary editorial fix.
+
+### 6. Outlier Multiples Analyzer (`src/lib/tools/swipe.ts`)
+- Calculates median views per channel across a creator's swipe file.
+- Disqualifies thin channels with fewer than 4 recorded videos to prevent statistical distortion.
+- Computes performance multiple (Video Views / Channel Median Views). Multiples ≥2.5x are classified as genuine format outliers.

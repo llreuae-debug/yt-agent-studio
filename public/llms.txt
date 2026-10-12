@@ -1,0 +1,35 @@
+# YT Agent Studio
+> Note: /llms.txt is an emerging web convention for AI assistants and generative search systems.
+
+YT Agent Studio is an independent, free, local-first web application for YouTube creators that runs 11 deterministic scoring algorithms and structured AI writing tools. The application does not publish to YouTube, requires zero OAuth credentials, and stores all creator data locally in the browser (`localStorage`). Derived from the open-source MIT-licensed `Jakeschincariol/youtube-agent-skill` suite.
+
+- Canonical URL: https://yt-agent-studio.vercel.app
+- License: MIT License (https://opensource.org/licenses/MIT)
+- Disclaimers: Not affiliated with, endorsed by, or sponsored by YouTube or Google.
+
+## Core Modules & Capabilities
+
+- [Home](https://yt-agent-studio.vercel.app/): Interactive dashboard and overview of all 11 creator skills.
+- [Script Engine (/script)](https://yt-agent-studio.vercel.app/script): Generates 5 candidate hooks tagged with the 21 formulas from hooks.json, scores them deterministically across 5 properties, ranks the top two, and writes a retention script with [ON SCREEN: ...] visual cues.
+- [Package Studio (/package)](https://yt-agent-studio.vercel.app/package): Generates 10 titles, lints down to the top three using desktop (60-char) and mobile (40-char) cutoffs, writes 3-word thumbnail briefs, and checks title-thumbnail word duplication.
+- [Edit Decision List (/edit)](https://yt-agent-studio.vercel.app/edit): Pure deterministic analysis of .srt, .vtt, or Whisper JSON transcripts detecting dead-air gaps above customizable floors, filler sounds ("um"), and restarted sentences.
+- [Comment Replier (/comment)](https://yt-agent-studio.vercel.app/comment): Triages comments into 4 distinct piles (Questions, Corrections, Praise, Bait) with count badges, enforces <30 word replies, and picks which single comment to pin.
+- [Production Planner (/plan)](https://yt-agent-studio.vercel.app/plan): Sized strictly to creator capacity (hours available and existing assets), planning 1 anchor, 1 cheap video, and 3 Shorts with an honest cutline line.
+- [Viral Swipe Analysis (/viral)](https://yt-agent-studio.vercel.app/viral): Ranks collected videos by multiple over channel median (minimum 4 videos per channel to prevent noise) and classifies title formulas.
+- [Retention Reader (/retention)](https://yt-agent-studio.vercel.app/retention): Visualizes retention curves, diagnoses Hook Leak (first 30s), steep drop Cliffs mapped to words, and mid-video Slide rates, delivering exactly one primary fix.
+- [Shorts Cutter (/shorts)](https://yt-agent-studio.vercel.app/shorts): Extracts 20–55s self-contained moments from long transcripts, writing replacement hooks, on-screen text for the first 2 seconds, seamless loop points, and 9:16 vertical crop notes.
+- [SEO Studio (/seo)](https://yt-agent-studio.vercel.app/seo): Formats the search snippet (top two lines above "...more"), links, chapters, and max 15 disambiguation tags with the deterministic Query Test.
+- [Compliant Chapters (/chapters)](https://yt-agent-studio.vercel.app/chapters): Enforces YouTube chapter rules (0:00 start, 3+ chapters, 10s minimum each) with pause gap analysis.
+- [Channel Audit (/audit)](https://yt-agent-studio.vercel.app/audit): Lints 10 titles, scores 3 opening hooks, checks upload cadence consistency, and simulates thumbnail readability at mobile feed size (168x94px).
+- [Voice Profile (/voice)](https://yt-agent-studio.vercel.app/voice): Customizes target audience, spoken cadence, forbidden words, and tone format injected into every AI run.
+
+## Guides & Documentation
+- [How to Read YouTube Retention Graphs](https://yt-agent-studio.vercel.app/guides/audience-retention): Explains hook leak, cliff drops, and slide rate diagnostics.
+- [YouTube Title Rules (60 vs 40 Chars)](https://yt-agent-studio.vercel.app/guides/youtube-title-rules): Guide to search cutoffs, mobile truncation, and thumbnail word duplication.
+- [YouTube Chapter Rules & Formatting](https://yt-agent-studio.vercel.app/guides/youtube-chapters): Explains timestamp rules (0:00 start, 3 chapters, 10s minimum).
+- [21 YouTube Hook Formulas](https://yt-agent-studio.vercel.app/guides/youtube-hook-formulas): Structural breakdown of opening hook formulas that retain viewers.
+- [About & Fact Sheet](https://yt-agent-studio.vercel.app/about): Origins, open-source attribution, and product fact sheet.
+- [FAQ](https://yt-agent-studio.vercel.app/faq): Frequently asked questions about local storage, pricing, AI providers, and honest heuristics.
+- [Changelog](https://yt-agent-studio.vercel.app/changelog): Release history and feature log.
+- [Privacy Policy](https://yt-agent-studio.vercel.app/privacy): Local-first browser storage and privacy architecture.
+- [Terms of Use](https://yt-agent-studio.vercel.app/terms): Open-source license terms and usage limits.
