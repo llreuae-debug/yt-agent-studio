@@ -29,3 +29,5 @@ reference/
 next-env.d.ts
 .vercel/
 .netlify/
+.env*
+!.env.example
