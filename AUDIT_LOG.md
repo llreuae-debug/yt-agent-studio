@@ -114,11 +114,24 @@ Automated full-browser verification recorded in session artifact `full_app_audit
 
 ## 7. Live Production Deployment & Verification (Section 6)
 - **Live Production URL:** `https://yt-agent-studio.vercel.app`
-- **Deployment URL:** `https://yt-agent-studio-b6eo4b91q-llreuae-debug.vercel.app`
-- **GitHub Repository:** `https://github.com/llreuae-debug/yt-agent-studio` (Private)
-- **Host / Preset:** Vercel (Next.js Framework Preset, Node.js 24)
-- **Build Status:** Success (0 errors, 18/18 routes deployed)
-- **Live Smoke Test:**
-  - `HTTP/2 200 OK` on home page and all routes.
-  - API `/api/generate` error handling verified with safe JSON 400s and 200s.
+- **Active Deployment URL:** `https://yt-agent-studio-2y6jzpy9a-llreuae-debug.vercel.app`
+- **GitHub Repository:** `https://github.com/llreuae-debug/yt-agent-studio` (Public)
+- **Host / Preset:** Vercel (Next.js Framework Preset, Node.js 24.x)
+- **Build Status:** Success (0 errors, 30/30 routes deployed in 57s)
+- **Live Smoke Test (All 27 public endpoints verified with HTTP 200 OK):**
+  - Canonical Home: `https://yt-agent-studio.vercel.app/` &rarr; `200 OK`
+  - Robots: `https://yt-agent-studio.vercel.app/robots.txt` &rarr; `200 OK`
+  - Sitemap: `https://yt-agent-studio.vercel.app/sitemap.xml` &rarr; `200 OK`
+  - LLM Text Index: `https://yt-agent-studio.vercel.app/llms.txt` &rarr; `200 OK`
+  - LLM Full Spec: `https://yt-agent-studio.vercel.app/llms-full.txt` &rarr; `200 OK`
+  - Security TXT: `https://yt-agent-studio.vercel.app/.well-known/security.txt` &rarr; `200 OK`
+  - About & Fact Sheet: `https://yt-agent-studio.vercel.app/about` &rarr; `200 OK`
+  - Creator FAQ: `https://yt-agent-studio.vercel.app/faq` &rarr; `200 OK`
+  - Changelog: `https://yt-agent-studio.vercel.app/changelog` &rarr; `200 OK`
+  - Privacy Policy: `https://yt-agent-studio.vercel.app/privacy` &rarr; `200 OK`
+  - Terms of Service: `https://yt-agent-studio.vercel.app/terms` &rarr; `200 OK`
+  - 4 Educational Guides: `/guides/audience-retention`, `/guides/youtube-title-rules`, `/guides/youtube-chapters`, `/guides/youtube-hook-formulas` &rarr; `200 OK`
+  - 11 Core Creator Modules: `/script`, `/package`, `/edit`, `/comment`, `/plan`, `/viral`, `/retention`, `/shorts`, `/seo`, `/chapters`, `/audit` &rarr; `200 OK`
+  - Voice Profile: `/voice` &rarr; `200 OK`
   - Browser subagent verified landing page, `/script` hook generator + scoring, full retention script generation, `/voice`, and responsive dark theme with 0 console errors.
+
