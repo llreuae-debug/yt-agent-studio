@@ -1,0 +1,110 @@
+/**
+ * YT AGENT STUDIO - TYPOGRAPHY SYSTEM
+ * STRICTLY HELVETICA FAMILY ONLY
+ *
+ * Helvetica Neue is built into macOS and iOS natively.
+ * On Windows and Android, the family gracefully falls back to Arial / Liberation Sans,
+ * which are metric-compatible with Helvetica.
+ *
+ * IF SELF-HOSTING LICENSED HELVETICA (Monotype web license for Helvetica Now or Helvetica Neue):
+ * Place WOFF2 font files in /public/fonts/ and uncomment the @font-face declarations below:
+ *
+ * @font-face {
+ *   font-family: "Helvetica Neue";
+ *   src: url("/fonts/HelveticaNeue-Roman.woff2") format("woff2");
+ *   font-weight: 400;
+ *   font-style: normal;
+ *   font-display: swap;
+ * }
+ * @font-face {
+ *   font-family: "Helvetica Neue";
+ *   src: url("/fonts/HelveticaNeue-Medium.woff2") format("woff2");
+ *   font-weight: 500;
+ *   font-style: normal;
+ *   font-display: swap;
+ * }
+ * @font-face {
+ *   font-family: "Helvetica Neue";
+ *   src: url("/fonts/HelveticaNeue-Bold.woff2") format("woff2");
+ *   font-weight: 700;
+ *   font-style: normal;
+ *   font-display: swap;
+ * }
+ * @font-face {
+ *   font-family: "Helvetica Neue";
+ *   src: url("/fonts/HelveticaNeue-Black.woff2") format("woff2");
+ *   font-weight: 900;
+ *   font-style: normal;
+ *   font-display: swap;
+ * }
+ */
+
+:root {
+  --font: "Helvetica Neue", "Helvetica Now Display", "Helvetica Now Text", Helvetica,
+          "Nimbus Sans", "Liberation Sans", Arial, sans-serif;
+  --font-condensed: "Helvetica Neue Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+html, body, button, input, textarea, select {
+  font-family: var(--font);
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Fluid Typographic Utilities */
+.type-hero {
+  font-size: clamp(48px, 9vw, 128px);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+}
+
+.type-h1 {
+  font-size: clamp(32px, 5vw, 64px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.type-h2 {
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.type-h3 {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.type-body {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+  max-width: 68ch;
+}
+
+.type-small {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.type-label {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+}
+
+.type-tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}

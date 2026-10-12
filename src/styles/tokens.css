@@ -1,0 +1,57 @@
+:root {
+  /* Dark (Default YouTube Studio Theme) */
+  --bg: #0F0F0F;
+  --surface-1: #181818;
+  --surface-2: #212121;
+  --surface-3: #272727;
+  --line: #3F3F3F;
+  --text: #F1F1F1;
+  --text-2: #AAAAAA;
+  --yt-red: #FF0000;
+  --yt-red-ink: #E00000; /* Contrast-safe for small white text on red */
+  --yt-red-text: #FF4E45; /* Contrast-safe for red text/icons on dark surfaces */
+  --link: #3EA6FF;
+  --ok: #2BA640;
+  --warn: #FFB020;
+  --bad: #FF4E45;
+
+  /* Gradients & Effects */
+  --grad-hot: linear-gradient(135deg, #FF0000 0%, #FF4E45 55%, #FF8A65 100%);
+  --grad-night: radial-gradient(120% 120% at 0% 0%, #2A0A0A 0%, #0F0F0F 55%);
+  --glow-red: 0 0 0 1px rgba(255, 0, 0, 0.35), 0 8px 40px rgba(255, 0, 0, 0.25);
+  --glass-bg: rgba(24, 24, 24, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.08);
+
+  /* Motion Tokens */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --duration-micro: 120ms;
+  --duration-ui: 220ms;
+  --duration-reveal: 420ms;
+  --duration-page: 500ms;
+}
+
+.light {
+  /* Light Theme ("White YouTube" Look) */
+  --bg: #FFFFFF;
+  --surface-1: #F9F9F9;
+  --surface-2: #F2F2F2;
+  --surface-3: #E5E5E5;
+  --line: #D9D9D9;
+  --text: #0F0F0F;
+  --text-2: #606060;
+  --yt-red: #FF0000;
+  --yt-red-ink: #CC0000;
+  --yt-red-text: #CC0000;
+  --link: #065FD4;
+  --ok: #137333;
+  --warn: #B06000;
+  --bad: #CC0000;
+
+  /* Gradients & Effects */
+  --grad-hot: linear-gradient(135deg, #FF0000 0%, #E60000 55%, #CC0000 100%);
+  --grad-night: radial-gradient(120% 120% at 0% 0%, #FFF5F5 0%, #FFFFFF 55%);
+  --glow-red: 0 0 0 1px rgba(204, 0, 0, 0.25), 0 8px 30px rgba(204, 0, 0, 0.15);
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.06);
+}
