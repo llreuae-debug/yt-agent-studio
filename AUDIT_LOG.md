@@ -109,3 +109,16 @@ Automated full-browser verification recorded in session artifact `full_app_audit
 - [x] Secret scan clean (0 secrets in working tree).
 - [x] `README.md` complete and up-to-date.
 - [x] All test suites passing (Vitest, Contrast, TypeScript, ESLint, Next.js build).
+
+---
+
+## 7. Live Production Deployment & Verification (Section 6)
+- **Live Production URL:** `https://yt-agent-studio.vercel.app`
+- **Deployment URL:** `https://yt-agent-studio-b6eo4b91q-llreuae-debug.vercel.app`
+- **GitHub Repository:** `https://github.com/llreuae-debug/yt-agent-studio` (Private)
+- **Host / Preset:** Vercel (Next.js Framework Preset, Node.js 24)
+- **Build Status:** Success (0 errors, 18/18 routes deployed)
+- **Live Smoke Test:**
+  - `HTTP/2 200 OK` on home page and all routes.
+  - API `/api/generate` error handling verified with safe JSON 400s and 200s.
+  - Browser subagent verified landing page, `/script` hook generator + scoring, full retention script generation, `/voice`, and responsive dark theme with 0 console errors.
