@@ -23,6 +23,7 @@ const COMMANDS: CommandItem[] = [
   { name: "Retention", slash: "/yt-retention", path: "/retention", desc: "Studio Retention CSV Reader & Cliffs" },
   { name: "Shorts", slash: "/yt-shorts", path: "/shorts", desc: "20-55s Transcript Cutter & Hook Rewrite" },
   { name: "SEO", slash: "/yt-seo", path: "/seo", desc: "Description Snippet & Query Win Test" },
+  { name: "Tags Finder", slash: "/yt-tags", path: "/tags", desc: "Extract Video Tags & Keyword Frequency" },
   { name: "Chapters", slash: "/yt-chapters", path: "/chapters", desc: "YouTube Validated Timestamps" },
   { name: "Audit", slash: "/yt-audit", path: "/audit", desc: "Feed-Size Thumbnail & 1 Big Fix" },
   { name: "Design System", slash: "/design-system", path: "/design-system", desc: "Live Tokens, Helvetica Specimen & Components" },

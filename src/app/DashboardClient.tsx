@@ -20,6 +20,7 @@ import {
   Clock,
   Play,
   TrendingUp,
+  Tag,
 } from "lucide-react";
 import { VoiceBanner } from "@/components/shell/VoiceBanner";
 import { getHistory, HistoryRun } from "@/lib/storage";
@@ -29,6 +30,7 @@ import { Sticker } from "@/components/ui/Sticker";
 const MARQUEE_COMMANDS = [
   "/yt-script",
   "/yt-package",
+  "/yt-tags",
   "/yt-edit",
   "/yt-comment",
   "/yt-plan",
@@ -403,6 +405,30 @@ export default function DashboardPage() {
               </div>
               <div className="pt-4 border-t border-line flex items-center justify-between text-xs mt-4">
                 <span className="type-tabular text-txt-2">{getLastRunTime("SEO")}</span>
+                <ArrowRight className="w-3.5 h-3.5 text-txt-2 group-hover:text-yt-red group-hover:translate-x-1 transition-all" />
+              </div>
+            </Card>
+          </Link>
+
+          {/* TAGS FINDER MODULE (1 Tile) */}
+          <Link href="/tags" className="group">
+            <Card className="h-full p-6 border-line group-hover:border-yt-red transition-all flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 rounded-pill bg-surface-2 text-txt group-hover:bg-yt-red group-hover:text-white transition-colors">
+                    <Tag className="w-4 h-4" />
+                  </div>
+                  <span className="type-label text-[10px] text-ok">500-CHAR LIMIT</span>
+                </div>
+                <div className="type-h2 font-black text-txt group-hover:text-yt-red transition-colors">
+                  /yt-tags
+                </div>
+                <p className="type-small text-txt-2 mt-2">
+                  Extract video tags, keyword frequency ranking, and 500-char tag builder.
+                </p>
+              </div>
+              <div className="pt-4 border-t border-line flex items-center justify-between text-xs mt-4">
+                <span className="type-tabular text-txt-2">Ready</span>
                 <ArrowRight className="w-3.5 h-3.5 text-txt-2 group-hover:text-yt-red group-hover:translate-x-1 transition-all" />
               </div>
             </Card>

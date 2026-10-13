@@ -20,6 +20,7 @@ import {
   Bookmark,
   ShieldCheck,
   Palette,
+  Tag,
 } from "lucide-react";
 
 const MAIN_ITEMS = [
@@ -30,6 +31,7 @@ const MAIN_ITEMS = [
 ];
 
 const MORE_MODULES = [
+  { name: "Tags Finder", path: "/tags", slash: "/yt-tags", icon: Tag },
   { name: "Edit", path: "/edit", slash: "/yt-edit", icon: Scissors },
   { name: "Comment", path: "/comment", slash: "/yt-comment", icon: MessageSquare },
   { name: "Plan", path: "/plan", slash: "/yt-plan", icon: Calendar },

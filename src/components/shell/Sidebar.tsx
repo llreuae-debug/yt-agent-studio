@@ -19,6 +19,7 @@ import {
   X,
   Sparkles,
   Palette,
+  Tag,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -29,6 +30,7 @@ interface SidebarProps {
 const MODULES = [
   { name: "Script", path: "/script", slash: "/yt-script", icon: FileText },
   { name: "Package", path: "/package", slash: "/yt-package", icon: Package },
+  { name: "Tags Finder", path: "/tags", slash: "/yt-tags", icon: Tag },
   { name: "Edit", path: "/edit", slash: "/yt-edit", icon: Scissors },
   { name: "Comment", path: "/comment", slash: "/yt-comment", icon: MessageSquare },
   { name: "Plan", path: "/plan", slash: "/yt-plan", icon: Calendar },

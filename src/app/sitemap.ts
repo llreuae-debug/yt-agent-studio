@@ -23,6 +23,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/retention", priority: 0.9, changeFrequency: "weekly" as const },
     { path: "/shorts", priority: 0.8, changeFrequency: "weekly" as const },
     { path: "/seo", priority: 0.9, changeFrequency: "weekly" as const },
+    { path: "/tags", priority: 0.9, changeFrequency: "weekly" as const },
     { path: "/chapters", priority: 0.9, changeFrequency: "weekly" as const },
     { path: "/audit", priority: 0.9, changeFrequency: "weekly" as const },
     { path: "/voice", priority: 0.8, changeFrequency: "monthly" as const },
